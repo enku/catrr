@@ -4,6 +4,8 @@ import hashlib
 import json
 from typing import IO, Any, Iterator, Sequence, TypedDict
 
+from filelock import FileLock
+
 ENCODING = "UTF-8"
 now = dt.datetime.now
 
@@ -69,8 +71,9 @@ class Storage:
 
         data[self.key(rr.items)] = self.value(rr, now(tz=dt.UTC))
 
-        with open(self.filename, "w", encoding=ENCODING) as fp:
-            json.dump(data, fp, indent=4)
+        with FileLock(f"{self.filename}.lock"):
+            with open(self.filename, "w", encoding=ENCODING) as fp:
+                json.dump(data, fp, indent=4)
 
     def load(self, items: Sequence[str]) -> RoundRobin[str]:
         """Load the given RoundRobin object from storage
@@ -104,11 +107,12 @@ class Storage:
 
         If the storage file doesn't yet exist, return an empty dict
         """
-        with open(self.filename, "r", encoding=ENCODING) as fp:
-            try:
-                return json.load(fp)
-            except json.JSONDecodeError:
-                return {}
+        with FileLock(f"{self.filename}.lock"):
+            with open(self.filename, "r", encoding=ENCODING) as fp:
+                try:
+                    return json.load(fp)
+                except json.JSONDecodeError:
+                    return {}
 
 
 class StatefulRR:

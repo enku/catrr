@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["cross_platform"]
 lock_version = "4.4"
-content_hash = "sha256:07c55c6067c221221c0d6feb6fe4e665ffb4b6e82db1f98314a310510b8b3bb3"
+content_hash = "sha256:9405055b91860302487890fec902045d5b6825a38cce7fb2bc5fd235d173ba5d"
 
 [[package]]
 name = "astroid"
@@ -85,6 +85,16 @@ summary = "serialize all of Python"
 files = [
     {file = "dill-0.3.7-py3-none-any.whl", hash = "sha256:76b122c08ef4ce2eedcd4d1abd8e641114bfc6c2867f49f3c41facf65bf19f5e"},
     {file = "dill-0.3.7.tar.gz", hash = "sha256:cc1c8b182eb3013e24bd475ff2e9295af86c1a38eb1aff128dac8962a9ce3c03"},
+]
+
+[[package]]
+name = "filelock"
+version = "3.13.1"
+requires_python = ">=3.8"
+summary = "A platform independent file lock."
+files = [
+    {file = "filelock-3.13.1-py3-none-any.whl", hash = "sha256:57dbda9b35157b05fb3e58ee91448612eb674172fab98ee235ccb0b5bee19a1c"},
+    {file = "filelock-3.13.1.tar.gz", hash = "sha256:521f5f56c50f8426f5e03ad3b281b490a87ef15bc6c526f168290f0c7148d44e"},
 ]
 
 [[package]]
