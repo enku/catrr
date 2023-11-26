@@ -5,11 +5,31 @@ description = "cat files in a round-robin fashion"
 authors = [
     {name = "Albert Hopkins", email = "marduk@letterboxes.org"},
 ]
-dependencies = []
+dependencies = [
+    "platformdirs>=4.0.0",
+]
 requires-python = ">=3.12"
 readme = "README.md"
 license = {text = "GPL-3"}
 
+[project.scripts]
+catrr = "catrr.cli:main"
+
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "pylint>=3.0.2",
+    "pyright>=1.1.337",
+    "isort>=5.12.0",
+    "black>=23.11.0",
+    "coverage>=7.3.2",
+]
+
+[tool.coverage.run]
+source = ["catrr"]
+
+[tool.black]
+target-version = ["py312"]
