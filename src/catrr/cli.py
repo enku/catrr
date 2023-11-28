@@ -1,14 +1,14 @@
 """catrr command-line interface"""
 import argparse
-import os
 import sys
+from pathlib import Path
 from typing import Sequence
 
 import platformdirs
 
 from catrr import StatefulRR
 
-DEFAULT_STATE_FILE = os.path.join(platformdirs.user_data_dir(), "catrr.data")
+DEFAULT_STATE_FILE = Path(platformdirs.user_state_dir()) / "catrr.data"
 
 
 def main(argv: Sequence[str] | None = None) -> None:
@@ -26,6 +26,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
     parser.add_argument(
         "--state",
         "-s",
+        type=Path,
         default=DEFAULT_STATE_FILE,
         help=f"State file (default: {DEFAULT_STATE_FILE})",
     )

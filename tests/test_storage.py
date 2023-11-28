@@ -1,6 +1,7 @@
 # pylint: disable=missing-docstring
 import datetime as dt
 import os
+from pathlib import Path
 from unittest import mock
 
 from catrr import RoundRobin, Storage
@@ -12,7 +13,7 @@ class StorageTestCase(TestCase):
     @mock.patch("catrr.now")
     def test_can_save(self, now: mock.Mock) -> None:
         now.return_value = dt.datetime(2023, 11, 25, 7, 38, tzinfo=dt.UTC)
-        storage = Storage(self.filename)
+        storage = Storage(Path(self.filename))
         rr = RoundRobin(["a", "b", "c"])
         next(iter(rr))
         storage.save(rr)
@@ -36,7 +37,7 @@ class StorageTestCase(TestCase):
 
     def test_save_when_file_does_not_exist(self) -> None:
         os.unlink(self.filename)
-        storage = Storage(self.filename)
+        storage = Storage(Path(self.filename))
         rr = RoundRobin(["a", "b", "c"])
         next(iter(rr))
         storage.save(rr)
@@ -46,7 +47,7 @@ class StorageTestCase(TestCase):
     @mock.patch("catrr.now")
     def test_can_load(self, now) -> None:
         now.return_value = dt.datetime(2023, 11, 25, 7, 38, tzinfo=dt.UTC)
-        storage = Storage(self.filename)
+        storage = Storage(Path(self.filename))
         rr = RoundRobin(["a", "b", "c"])
         next(iter(rr))
         storage.save(rr)
@@ -56,7 +57,7 @@ class StorageTestCase(TestCase):
         self.assertEqual(rr, loaded_rr)
 
     def test_load_when_does_not_exist(self) -> None:
-        storage = Storage(self.filename)
+        storage = Storage(Path(self.filename))
         rr = RoundRobin(["a", "b", "c"])
 
         self.assertEqual(storage.load(["a", "b", "c"]), rr)

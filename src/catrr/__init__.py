@@ -2,6 +2,7 @@
 import datetime as dt
 import hashlib
 import json
+from pathlib import Path
 from typing import IO, Any, Iterator, Sequence, TypedDict
 
 from filelock import FileLock
@@ -55,8 +56,8 @@ class StorageValue(TypedDict):
 class Storage:
     """File-backed storage for RoundRobin instances"""
 
-    def __init__(self, filename: str) -> None:
-        self.filename = filename
+    def __init__(self, path: Path) -> None:
+        self.path = path
 
     def save(self, rr: RoundRobin[str]) -> None:
         """Save the RoundRobin instance to storage
@@ -71,9 +72,8 @@ class Storage:
 
         data[self.key(rr.items)] = self.value(rr, now(tz=dt.UTC))
 
-        with FileLock(f"{self.filename}.lock"):
-            with open(self.filename, "w", encoding=ENCODING) as fp:
-                json.dump(data, fp, indent=4)
+        with FileLock(f"{self.path}.lock"):
+            self.path.write_text(json.dumps(data, indent=4), encoding=ENCODING)
 
     def load(self, items: Sequence[str]) -> RoundRobin[str]:
         """Load the given RoundRobin object from storage
@@ -107,18 +107,18 @@ class Storage:
 
         If the storage file doesn't yet exist, return an empty dict
         """
-        with FileLock(f"{self.filename}.lock"):
-            with open(self.filename, "r", encoding=ENCODING) as fp:
-                try:
-                    return json.load(fp)
-                except json.JSONDecodeError:
-                    return {}
+        with FileLock(f"{self.path}.lock"):
+            data = self.path.read_text(encoding=ENCODING)
+            try:
+                return cast(dict[str, StorageValue], json.loads(data))
+            except json.JSONDecodeError:
+                return {}
 
 
 class StatefulRR:
     """Class that combines RoundRobin and Storage into a single unit"""
 
-    def __init__(self, items: Sequence[str], state_file: str) -> None:
+    def __init__(self, items: Sequence[str], state_file: Path) -> None:
         self._iter: Iterator[str]
         self.storage = Storage(state_file)
 

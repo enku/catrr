@@ -2,6 +2,7 @@
 # pylint: disable=missing-docstring
 import datetime as dt
 import os
+from pathlib import Path
 from unittest import mock
 
 from catrr import ENCODING, StatefulRR
@@ -14,7 +15,7 @@ class StatefulRRTestCase(TestCase):
     def test(self, now: mock.Mock) -> None:
         now.return_value = dt.datetime(2023, 11, 26, 7, 38, tzinfo=dt.UTC)
         os.unlink(self.filename)
-        stateful_rr = StatefulRR(["foo", "bar"], self.filename)
+        stateful_rr = StatefulRR(["foo", "bar"], Path(self.filename))
 
         self.assertEqual(next(iter(stateful_rr)), "foo")
         expected = """\
