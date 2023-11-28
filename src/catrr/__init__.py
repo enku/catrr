@@ -3,7 +3,7 @@ import datetime as dt
 import hashlib
 import json
 from pathlib import Path
-from typing import IO, Any, Iterator, Sequence, TypedDict
+from typing import IO, Any, Iterator, Sequence, TypedDict, cast
 
 from filelock import FileLock
 
