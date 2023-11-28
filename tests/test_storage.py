@@ -2,21 +2,21 @@
 import datetime as dt
 import os
 from pathlib import Path
-from unittest import mock
 
-from catrr import RoundRobin, Storage
+import catrr
 
 from . import TestCase
 
 
 class StorageTestCase(TestCase):
-    @mock.patch("catrr.now")
-    def test_can_save(self, now: mock.Mock) -> None:
-        now.return_value = dt.datetime(2023, 11, 25, 7, 38, tzinfo=dt.UTC)
-        storage = Storage(Path(self.filename))
-        rr = RoundRobin(["a", "b", "c"])
-        next(iter(rr))
-        storage.save(rr)
+    def setUp(self) -> None:
+        super().setUp()
+        os.unlink(self.filename)
+
+    def test_save(self) -> None:
+        timestamp = dt.datetime(2023, 11, 25, 7, 38, tzinfo=dt.UTC)
+        items = ["a", "b", "c"]
+        catrr.save(Path(self.filename), items, 0, timestamp)
 
         with open(self.filename, "rb") as fp:
             content = fp.read()
@@ -25,39 +25,21 @@ class StorageTestCase(TestCase):
 {
     "d33b202c020cbde1c4a7bb26d0b02e66645407dcef42c63543cff899b8f979c8": {
         "current": 0,
-        "items": [
-            "a",
-            "b",
-            "c"
-        ],
         "last_modified": "2023-11-25T07:38:00+00:00"
     }
 }"""
         self.assertEqual(content, expected)
 
-    def test_save_when_file_does_not_exist(self) -> None:
-        os.unlink(self.filename)
-        storage = Storage(Path(self.filename))
-        rr = RoundRobin(["a", "b", "c"])
-        next(iter(rr))
-        storage.save(rr)
+    def test_load(self) -> None:
+        timestamp = dt.datetime(2023, 11, 25, 7, 38, tzinfo=dt.UTC)
+        items = ["a", "b", "c"]
+        catrr.save(Path(self.filename), items, 2, timestamp)
 
-        self.assertEqual(storage.load(["a", "b", "c"]), rr)
+        current = catrr.load(Path(self.filename), ["a", "b", "c"])
 
-    @mock.patch("catrr.now")
-    def test_can_load(self, now) -> None:
-        now.return_value = dt.datetime(2023, 11, 25, 7, 38, tzinfo=dt.UTC)
-        storage = Storage(Path(self.filename))
-        rr = RoundRobin(["a", "b", "c"])
-        next(iter(rr))
-        storage.save(rr)
-
-        loaded_rr = storage.load(["a", "b", "c"])
-
-        self.assertEqual(rr, loaded_rr)
+        self.assertEqual(current, 2)
 
     def test_load_when_does_not_exist(self) -> None:
-        storage = Storage(Path(self.filename))
-        rr = RoundRobin(["a", "b", "c"])
+        items = ["a", "b", "c"]
 
-        self.assertEqual(storage.load(["a", "b", "c"]), rr)
+        self.assertEqual(catrr.load(Path(self.filename), items), -1)

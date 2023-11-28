@@ -1,4 +1,5 @@
 # pylint: disable=missing-docstring
+import os
 import tempfile
 from unittest import mock
 
@@ -11,6 +12,7 @@ class MainTestCase(TestCase):
     def setUp(self) -> None:
         tmp = tempfile.NamedTemporaryFile()  # pylint: disable=consider-using-with
         self.state_file = tmp.name
+        os.unlink(tmp.name)
         self.addCleanup(tmp.close)
 
     def test(self) -> None:
