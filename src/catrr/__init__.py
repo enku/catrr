@@ -5,8 +5,6 @@ import json
 from pathlib import Path
 from typing import IO, Any, Iterator, Sequence, TypedDict, cast
 
-from filelock import FileLock
-
 ENCODING = "UTF-8"
 
 
@@ -42,9 +40,8 @@ def save(
     A last_modified field is also stored.
     """
     data: dict[str, StorageValue] = load_json(path) or {}
-    with FileLock(f"{path}.lock"):
-        new_data = {**data, **{key(items): value(current, timestamp)}}
-        path.write_text(json.dumps(new_data, indent=4), encoding=ENCODING)
+    new_data = {**data, **{key(items): value(current, timestamp)}}
+    path.write_text(json.dumps(new_data, indent=4), encoding=ENCODING)
 
 
 def load(path: Path, items: Sequence[str]) -> int:
@@ -74,9 +71,8 @@ def load_json(path: Path) -> dict[str, StorageValue] | None:
 
     If the storage file doesn't yet exist, return an empty dict
     """
-    with FileLock(f"{path}.lock"):
-        try:
-            data = path.read_text(encoding=ENCODING)
-        except FileNotFoundError:
-            return None
-        return cast(dict[str, StorageValue], json.loads(data))
+    try:
+        data = path.read_text(encoding=ENCODING)
+    except FileNotFoundError:
+        return None
+    return cast(dict[str, StorageValue], json.loads(data))
