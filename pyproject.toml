@@ -34,3 +34,7 @@ source = ["catrr"]
 
 [tool.black]
 target-version = ["py312"]
+
+[tool.mypy]
+files = ["src"]
+strict = true
