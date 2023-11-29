@@ -1,6 +1,7 @@
 """catrr command-line interface"""
 import argparse
 import datetime as dt
+import io
 import sys
 from pathlib import Path
 from typing import Sequence
@@ -19,10 +20,16 @@ def main(argv: Sequence[str] | None = None) -> None:
     """CLI entry point"""
     args = parse_args(argv if argv is not None else sys.argv[1:])
     with FileLock(f"{args.state}.lock"):
-        current = catrr.load(args.state, args.items)
-        path, current = catrr.rr_next(args.items, current)
+        try:
+            string_io = io.StringIO(args.state.read_text(encoding=catrr.ENCODING))
+        except FileNotFoundError:
+            string_io = io.StringIO("{}")
+        path, current = catrr.rr_next(args.items, catrr.load(string_io, args.items))
         sys.stdout.buffer.write(Path(path).read_bytes())
-        catrr.save(args.state, args.items, current, now(tz=dt.UTC))
+        args.state.write_text(
+            catrr.save(string_io, args.items, current, now(tz=dt.UTC)).getvalue(),
+            encoding=catrr.ENCODING,
+        )
 
 
 def parse_args(argv: Sequence[str]) -> argparse.Namespace:

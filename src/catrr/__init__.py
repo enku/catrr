@@ -1,8 +1,8 @@
 """catrr write files to stdout in round-robin fashion"""
 import datetime as dt
 import hashlib
+import io
 import json
-from pathlib import Path
 from typing import IO, Any, Iterator, Sequence, TypedDict, cast
 
 ENCODING = "UTF-8"
@@ -33,23 +33,24 @@ def rr_next[T](items: Sequence[T], current: int) -> tuple[T, int]:
 
 
 def save(
-    path: Path, items: Sequence[str], current: int, timestamp: dt.datetime
-) -> None:
+    string_io: io.StringIO, items: Sequence[str], current: int, timestamp: dt.datetime
+) -> io.StringIO:
     """Save the items state to storage
 
     A last_modified field is also stored.
     """
-    data: dict[str, StorageValue] = load_json(path) or {}
+    data = load_json(string_io)
     new_data = {**data, **{key(items): value(current, timestamp)}}
-    path.write_text(json.dumps(new_data, indent=4), encoding=ENCODING)
+
+    return io.StringIO(json.dumps(new_data, indent=4))
 
 
-def load(path: Path, items: Sequence[str]) -> int:
+def load(string_io: io.StringIO, items: Sequence[str]) -> int:
     """Load the items state from storage
 
     If the item state is not in storage, return -1
     """
-    data = load_json(path) or {}
+    data = load_json(string_io)
 
     if record := data.get(key(items)):
         return record["current"]
@@ -66,13 +67,6 @@ def value(current: int, timestamp: dt.datetime) -> StorageValue:
     return {"current": current, "last_modified": timestamp.isoformat()}
 
 
-def load_json(path: Path) -> dict[str, StorageValue] | None:
-    """Load the storage JSON into a Python dict
-
-    If the storage file doesn't yet exist, return an empty dict
-    """
-    try:
-        data = path.read_text(encoding=ENCODING)
-    except FileNotFoundError:
-        return None
-    return cast(dict[str, StorageValue], json.loads(data))
+def load_json(string_io: io.StringIO) -> dict[str, StorageValue]:
+    """Load the storage JSON into a Python dict"""
+    return cast(dict[str, StorageValue], json.loads(string_io.getvalue()))
