@@ -15,16 +15,14 @@ class StorageValue(TypedDict):
     last_modified: str  # timestamp in ISO format
 
 
-def rr_next[T](items: Sequence[T], current: int) -> tuple[T, int]:
+def rr_next[T](items: Sequence[T], index: int) -> tuple[T, int]:
     """Given the sequence of items and the current index, return the next item and it's index
 
     The next index is calculated in round-robin fashion. That is when we reach the end
     of the sequence, return 0.
-    If current is less than 0, return 0.
+    If index is less than 0, return 0.
     """
-    current = 0 if current < -1 or current >= len(items) - 1 else current + 1
-
-    return (items[current], current)
+    return items[i := 0 if index < -1 or index >= len(items) - 1 else index + 1], i
 
 
 def save(
