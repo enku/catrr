@@ -1,7 +1,7 @@
 # pylint: disable=missing-docstring
 import os
 import tempfile
-from unittest import mock
+from pathlib import Path
 
 from catrr import cli
 
@@ -15,6 +15,11 @@ class MainTestCase(TestCase):
         os.unlink(tmp.name)
         self.addCleanup(tmp.close)
 
+        tmp = tempfile.NamedTemporaryFile()  # pylint: disable=consider-using-with
+        self.output_file = tmp.name
+        os.unlink(tmp.name)
+        self.addCleanup(tmp.close)
+
     def test(self) -> None:
         tf = tempfile.NamedTemporaryFile
         with tf(buffering=0) as file1, tf(buffering=0) as file2:
@@ -22,11 +27,8 @@ class MainTestCase(TestCase):
             file2.write(b"bar\n")
             files = [file1.name, file2.name]
 
-            with mock.patch("catrr.cli.sys.stdout") as stdout:
-                cli.main(["-s", self.state_file, *files])
-                cli.main(["-s", self.state_file, *files])
+            cli.main(["-s", self.state_file, "-o", self.output_file, *files])
+            self.assertEqual(Path(self.output_file).read_bytes(), b"foo\n")
 
-            self.assertEqual(
-                stdout.buffer.write.call_args_list,
-                [mock.call(b"foo\n"), mock.call(b"bar\n")],
-            )
+            cli.main(["-s", self.state_file, "-o", self.output_file, *files])
+            self.assertEqual(Path(self.output_file).read_bytes(), b"bar\n")
