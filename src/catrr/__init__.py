@@ -22,12 +22,7 @@ def rr_next[T](items: Sequence[T], current: int) -> tuple[T, int]:
     of the sequence, return 0.
     If current is less than 0, return 0.
     """
-    if current < 0:
-        current = 0
-    else:
-        current += 1
-        if current >= len(items):
-            current = 0
+    current = 0 if current < -1 or current >= len(items) - 1 else current + 1
 
     return (items[current], current)
 
@@ -50,11 +45,7 @@ def load(string_io: io.StringIO, items: Sequence[str]) -> int:
 
     If the item state is not in storage, return -1
     """
-    data = load_json(string_io)
-
-    if record := data.get(key(items)):
-        return record["current"]
-    return -1
+    return data["current"] if (data := load_json(string_io).get(key(items))) else -1
 
 
 def key(items: Sequence[str]) -> str:
