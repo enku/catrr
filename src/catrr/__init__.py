@@ -3,7 +3,7 @@ import datetime as dt
 import hashlib
 import io
 import json
-from typing import IO, Any, Iterator, Sequence, TypedDict, cast
+from typing import Sequence, TypedDict, cast
 
 ENCODING = "UTF-8"
 
