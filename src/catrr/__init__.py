@@ -9,11 +9,14 @@ from typing import Sequence, TypedDict, cast
 ENCODING = "UTF-8"
 
 
-class StorageValue(TypedDict):
-    """The value stored in Storage (as JSON)"""
+class State(TypedDict):
+    """The value stored (as JSON)"""
 
     current: int
     last_modified: str  # timestamp in ISO format
+
+
+type StateMap = dict[str, State]
 
 
 def rr_next[T](items: Sequence[T], index: int) -> tuple[T, int]:
@@ -33,10 +36,10 @@ def save(
 
     A last_modified field is also stored.
     """
-    data = load_json(string_io)
-    new_data = {**data, **{key(items): value(current, timestamp)}}
+    states = load_json(string_io)
+    new_states = {**states, **{key(items): value(current, timestamp)}}
 
-    return io.StringIO(json.dumps(new_data, indent=4))
+    return io.StringIO(json.dumps(new_states, indent=4))
 
 
 def load(string_io: io.StringIO, items: Sequence[str]) -> int:
@@ -44,7 +47,7 @@ def load(string_io: io.StringIO, items: Sequence[str]) -> int:
 
     If the item state is not in storage, return -1
     """
-    return data["current"] if (data := load_json(string_io).get(key(items))) else -1
+    return state["current"] if (state := load_json(string_io).get(key(items))) else -1
 
 
 def key(items: Sequence[str]) -> str:
@@ -52,11 +55,11 @@ def key(items: Sequence[str]) -> str:
     return hashlib.sha256(json.dumps(list(items)).encode(ENCODING)).hexdigest()
 
 
-def value(current: int, timestamp: dt.datetime) -> StorageValue:
-    """Given the RoundRobin instance return the values to store in JSON"""
+def value(current: int, timestamp: dt.datetime) -> State:
+    """Given the RoundRobin instance return the State to store in JSON"""
     return {"current": current, "last_modified": timestamp.isoformat()}
 
 
-def load_json(string_io: io.StringIO) -> dict[str, StorageValue]:
+def load_json(string_io: io.StringIO) -> StateMap:
     """Load the storage JSON into a Python dict"""
-    return cast(dict[str, StorageValue], json.loads(string_io.getvalue()))
+    return cast(StateMap, json.loads(string_io.getvalue()))
