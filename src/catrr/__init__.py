@@ -1,4 +1,5 @@
 """catrr write files to stdout in round-robin fashion"""
+
 import datetime as dt
 import hashlib
 import io

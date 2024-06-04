@@ -1,4 +1,5 @@
 """catrr command-line interface"""
+
 import argparse
 import datetime as dt
 import io

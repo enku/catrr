@@ -1,4 +1,5 @@
 """Tests for the RoundRobin type"""
+
 # pylint: disable=missing-docstring
 
 from catrr import rr_next
