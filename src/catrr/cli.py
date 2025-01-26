@@ -4,6 +4,7 @@ import argparse
 import datetime as dt
 import io
 import sys
+from functools import partial
 from pathlib import Path
 from typing import Sequence
 
@@ -12,7 +13,7 @@ from filelock import FileLock
 
 import catrr
 
-now = dt.datetime.now
+now = partial(dt.datetime.now, tz=dt.UTC)
 
 DEFAULT_STATE_FILE = Path(platformdirs.user_state_dir()) / "catrr.data"
 
@@ -36,7 +37,7 @@ def main(argv: Sequence[str] | None = None) -> None:
             args.output.write_bytes(output)
 
         state.write_text(
-            catrr.save(string_io, items, current, now(tz=dt.UTC)).getvalue(),
+            catrr.save(string_io, items, current, now()).getvalue(),
             encoding=catrr.ENCODING,
         )
 
