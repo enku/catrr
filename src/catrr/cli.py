@@ -20,20 +20,23 @@ DEFAULT_STATE_FILE = Path(platformdirs.user_state_dir()) / "catrr.data"
 def main(argv: Sequence[str] | None = None) -> None:
     """CLI entry point"""
     args = parse_args(argv if argv is not None else sys.argv[1:])
-    with FileLock(f"{args.state}.lock"):
+    state: Path = args.state
+    items: list[str] = args.items
+    with FileLock(f"{state}.lock"):
         try:
-            string_io = io.StringIO(args.state.read_text(encoding=catrr.ENCODING))
+            string_io = io.StringIO(state.read_text(encoding=catrr.ENCODING))
         except FileNotFoundError:
             string_io = io.StringIO("{}")
-        path, current = catrr.rr_next(args.items, catrr.load(string_io, args.items))
+        path, current = catrr.rr_next(items, catrr.load(string_io, items))
 
+        output = Path(path).read_bytes()
         if str(args.output) == "-":  # not a Path, but stdout
-            sys.stdout.buffer.write(Path(path).read_bytes())
+            sys.stdout.buffer.write(output)
         else:
-            args.output.write_bytes(Path(path).read_bytes())
+            args.output.write_bytes(output)
 
-        args.state.write_text(
-            catrr.save(string_io, args.items, current, now(tz=dt.UTC)).getvalue(),
+        state.write_text(
+            catrr.save(string_io, items, current, now(tz=dt.UTC)).getvalue(),
             encoding=catrr.ENCODING,
         )
 
