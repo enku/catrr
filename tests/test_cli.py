@@ -1,5 +1,4 @@
 # pylint: disable=missing-docstring
-import os
 import tempfile
 from pathlib import Path
 
@@ -10,15 +9,11 @@ from . import TestCase
 
 class MainTestCase(TestCase):
     def setUp(self) -> None:
-        tmp = tempfile.NamedTemporaryFile()  # pylint: disable=consider-using-with
-        self.state_file = tmp.name
-        os.unlink(tmp.name)
-        self.addCleanup(tmp.close)
+        tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+        self.addCleanup(tmpdir.cleanup)
 
-        tmp = tempfile.NamedTemporaryFile()  # pylint: disable=consider-using-with
-        self.output_file = tmp.name
-        os.unlink(tmp.name)
-        self.addCleanup(tmp.close)
+        self.state_file = str(Path(tmpdir.name) / "state_file")
+        self.output_file = str(Path(tmpdir.name) / "output_file")
 
     def test(self) -> None:
         tf = tempfile.NamedTemporaryFile
