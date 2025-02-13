@@ -1,6 +1,6 @@
 [project]
 name = "catrr"
-version = "0.1.0"
+dynamic = ["version"]
 description = "cat files in a round-robin fashion"
 authors = [
     {name = "Albert Hopkins", email = "marduk@letterboxes.org"},
@@ -28,6 +28,9 @@ dev = [
     "black>=23.11.0",
     "coverage>=7.3.2",
 ]
+
+[tool.pdm.version]
+source = "scm"
 
 [tool.coverage.run]
 source = ["catrr"]
