@@ -27,12 +27,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         string_io = io.StringIO(path_to_string(state, default="{}"))
         path, current = catrr.rr_next(items, catrr.load(string_io, items))
 
-        output = Path(path).read_bytes()
-        if str(args.output) == "-":  # not a Path, but stdout
-            sys.stdout.buffer.write(output)
-        else:
-            args.output.write_bytes(output)
-
+        write_to_path(args.output, Path(path).read_bytes())
         state.write_text(
             catrr.save(string_io, items, current, now()).getvalue(),
             encoding=catrr.ENCODING,
@@ -48,6 +43,17 @@ def path_to_string(path: Path, default: str = "") -> str:
         return path.read_text(encoding=catrr.ENCODING)
     except FileNotFoundError:
         return default
+
+
+def write_to_path(path: Path, data: bytes) -> None:
+    """Write the given data to the file given in the path
+
+    If the path resolves to "-", writes to standard output.
+    """
+    if str(path) == "-":  # not a Path, but stdout
+        sys.stdout.buffer.write(data)
+    else:
+        path.write_bytes(data)
 
 
 def parse_args(argv: Sequence[str]) -> argparse.Namespace:
