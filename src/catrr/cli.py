@@ -24,10 +24,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     state: Path = args.state
     items: list[str] = args.items
     with FileLock(f"{state}.lock"):
-        try:
-            string_io = io.StringIO(state.read_text(encoding=catrr.ENCODING))
-        except FileNotFoundError:
-            string_io = io.StringIO("{}")
+        string_io = io.StringIO(path_to_string(state, default="{}"))
         path, current = catrr.rr_next(items, catrr.load(string_io, items))
 
         output = Path(path).read_bytes()
@@ -40,6 +37,17 @@ def main(argv: Sequence[str] | None = None) -> None:
             catrr.save(string_io, items, current, now()).getvalue(),
             encoding=catrr.ENCODING,
         )
+
+
+def path_to_string(path: Path, default: str = "") -> str:
+    """Return the contents of the given path as a string
+
+    If the given path doesn't exist, return the default string
+    """
+    try:
+        return path.read_text(encoding=catrr.ENCODING)
+    except FileNotFoundError:
+        return default
 
 
 def parse_args(argv: Sequence[str]) -> argparse.Namespace:
