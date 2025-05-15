@@ -28,10 +28,8 @@ def main(argv: Sequence[str] | None = None) -> None:
         path, current = catrr.rr_next(items, catrr.load(string_io, items))
 
         write_to_path(args.output, Path(path).read_bytes())
-        state.write_text(
-            catrr.save(string_io, items, current, now()).getvalue(),
-            encoding=catrr.ENCODING,
-        )
+        output = catrr.save(string_io, items, current, now()).getvalue()
+        state.write_text(output, encoding=catrr.ENCODING)
 
 
 def path_to_string(path: Path, default: str = "") -> str:
