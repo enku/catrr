@@ -16,6 +16,10 @@ license = {text = "GPL-3"}
 [project.scripts]
 catrr = "catrr.cli:main"
 
+[project.urls]
+homepage = "https://github.com/enku/catrr"
+repository = "https://github.com/enku/catrr"
+
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
