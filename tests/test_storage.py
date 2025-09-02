@@ -6,12 +6,13 @@ import catrr
 
 from . import TestCase
 
+TIMESTAMP = dt.datetime(2023, 11, 25, 7, 38, tzinfo=dt.UTC)
+
 
 class StorageTestCase(TestCase):
     def test_save(self) -> None:
-        timestamp = dt.datetime(2023, 11, 25, 7, 38, tzinfo=dt.UTC)
         items = ["a", "b", "c"]
-        string_io = catrr.save(io.StringIO("{}"), items, 0, timestamp)
+        string_io = catrr.save(io.StringIO("{}"), items, 0, TIMESTAMP)
 
         expected = """\
 {
@@ -23,9 +24,8 @@ class StorageTestCase(TestCase):
         self.assertEqual(string_io.getvalue(), expected)
 
     def test_load(self) -> None:
-        timestamp = dt.datetime(2023, 11, 25, 7, 38, tzinfo=dt.UTC)
         items = ["a", "b", "c"]
-        string_io = catrr.save(io.StringIO("{}"), items, 2, timestamp)
+        string_io = catrr.save(io.StringIO("{}"), items, 2, TIMESTAMP)
 
         current = catrr.load(string_io, ["a", "b", "c"])
 
