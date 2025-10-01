@@ -24,15 +24,6 @@ repository = "https://github.com/enku/catrr"
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
 
-[tool.pdm.dev-dependencies]
-dev = [
-    "pylint>=3.0.2",
-    "pyright>=1.1.337",
-    "isort>=5.12.0",
-    "black>=23.11.0",
-    "coverage>=7.3.2",
-]
-
 [tool.pdm.version]
 source = "scm"
 
@@ -43,5 +34,15 @@ source = ["catrr"]
 target-version = ["py312"]
 
 [tool.mypy]
-files = ["src"]
+files = ["src", "tests"]
 strict = true
+
+[dependency-groups]
+dev = [
+    "pylint>=3.0.2",
+    "pyright>=1.1.337",
+    "isort>=5.12.0",
+    "black>=23.11.0",
+    "coverage>=7.3.2",
+    "mypy>=1.17.1",
+]
