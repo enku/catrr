@@ -2,9 +2,9 @@
 
 # pylint: disable=missing-docstring
 
-from catrr import rr_next
+from unittest import TestCase
 
-from . import TestCase
+from catrr import rr_next
 
 
 class RoundRobinTestCase(TestCase):

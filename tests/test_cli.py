@@ -1,10 +1,9 @@
 # pylint: disable=missing-docstring
 import tempfile
 from pathlib import Path
+from unittest import TestCase
 
 from catrr import cli
-
-from . import TestCase
 
 
 class MainTestCase(TestCase):

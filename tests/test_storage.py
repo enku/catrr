@@ -1,10 +1,9 @@
 # pylint: disable=missing-docstring
 import datetime as dt
 import io
+from unittest import TestCase
 
 import catrr
-
-from . import TestCase
 
 TIMESTAMP = dt.datetime(2023, 11, 25, 7, 38, tzinfo=dt.UTC)
 
