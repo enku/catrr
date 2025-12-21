@@ -13,7 +13,9 @@ class State(TypedDict):
     """The value stored (as JSON)"""
 
     current: int
-    last_modified: str  # timestamp in ISO format
+
+    last_modified: str
+    """timestamp in ISO format"""
 
 
 type StateMap = dict[str, State]
