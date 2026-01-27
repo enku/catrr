@@ -1,6 +1,7 @@
 # pylint: disable=missing-docstring
 import datetime as dt
 import io
+import json
 from unittest import TestCase
 
 import catrr
@@ -13,14 +14,13 @@ class StorageTestCase(TestCase):
         items = ["a", "b", "c"]
         string_io = catrr.save(io.StringIO("{}"), items, 0, TIMESTAMP)
 
-        expected = """\
-{
-    "d33b202c020cbde1c4a7bb26d0b02e66645407dcef42c63543cff899b8f979c8": {
-        "current": 0,
-        "last_modified": "2023-11-25T07:38:00+00:00"
-    }
-}"""
-        self.assertEqual(string_io.getvalue(), expected)
+        expected = {
+            "d33b202c020cbde1c4a7bb26d0b02e66645407dcef42c63543cff899b8f979c8": {
+                "current": 0,
+                "last_modified": "2023-11-25T07:38:00+00:00",
+            }
+        }
+        self.assertEqual(json.load(string_io), expected)
 
     def test_load(self) -> None:
         items = ["a", "b", "c"]
