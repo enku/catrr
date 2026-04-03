@@ -21,15 +21,15 @@ DEFAULT_STATE_FILE = Path(platformdirs.user_state_dir()) / "catrr.data"
 def main(argv: Sequence[str] | None = None) -> None:
     """CLI entry point"""
     args = parse_args(argv if argv is not None else sys.argv[1:])
-    state: Path = args.state
+    state_path: Path = args.state
     items: list[str] = args.items
-    with FileLock(f"{state}.lock"):
-        string_io = io.StringIO(path_to_string(state, default="{}"))
+    with FileLock(f"{state_path}.lock"):
+        string_io = io.StringIO(path_to_string(state_path, default="{}"))
         path, current = catrr.rr_next(items, catrr.load(string_io, items))
 
         write_to_path(args.output, Path(path).read_bytes())
         output = catrr.save(string_io, items, current, now()).getvalue()
-        state.write_text(output, encoding=catrr.ENCODING)
+        state_path.write_text(output, encoding=catrr.ENCODING)
 
 
 def path_to_string(path: Path, default: str = "") -> str:
